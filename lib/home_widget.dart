@@ -85,8 +85,16 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   _openSendOrderMenu() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => SendOrderWidget()));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => SendOrderWidget(
+              orderStr: _getOrderStr(),
+            )));
+  }
+
+  String _getOrderStr() {
+    String orderStr = '';
+    _orders.forEach((e) { orderStr+=e.shopItem.name+'X'+e.quantity.toString()+'; ';});
+    return orderStr;
   }
 
   _updateSumm() {

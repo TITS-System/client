@@ -1,9 +1,16 @@
+import 'package:client_prototype/order_model.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class SendOrderWidget extends StatefulWidget {
+  final String? orderStr;
+
+  const SendOrderWidget({Key? key, this.orderStr})
+      : super(key: key);
+
   @override
   _SendOrderWidgetState createState() => _SendOrderWidgetState();
 }
@@ -13,6 +20,9 @@ class _SendOrderWidgetState extends State<SendOrderWidget> {
   var uuid = new Uuid();
   String? _sessionToken = null;
   List<dynamic> _placeList = [];
+  final addressAdditionalController = TextEditingController();
+  int restaurantId = 1;
+  String addressStr = "";
 
   void initState() {
     super.initState();
@@ -47,6 +57,27 @@ class _SendOrderWidgetState extends State<SendOrderWidget> {
     }
   }
 
+
+  sendOrder() async {
+    setState(() {
+      _sessionToken = null;
+    });
+    final query = addressStr;
+    var addresses = await Geocoder.local.findAddressesFromQuery(query);
+    var first = addresses.first;
+    LatLngDto LLd = LatLngDto(
+        Lat: first.coordinates.latitude, Lng: first.coordinates.longitude);
+    CreateOrderDto COd = CreateOrderDto(
+      RestaurantId: restaurantId,
+      Content: widget.orderStr!,
+      AddressString: addressStr,
+      AddressAdditional: addressAdditionalController.text,
+      Destination: LLd,
+    );
+
+    makeOrder(COd);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,9 +108,41 @@ class _SendOrderWidgetState extends State<SendOrderWidget> {
                 return _placeList.map((e) => e["description"]);
               },
               onSelected: (String selection) {
-                print('You just selected $selection');
+                setState(() {
+                  addressStr = selection;
+                });
               },
             ),
+          ),
+          RichText(
+              text: TextSpan(
+                  text: 'Address info:',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 255, 105, 0), fontSize: 30))),
+          Container(
+            padding: EdgeInsets.all(3),
+            margin: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(0, 255, 105, 0),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              border:
+                  Border.all(color: Color.fromARGB(255, 255, 105, 0), width: 3),
+            ),
+            child: TextField(
+              controller: addressAdditionalController,
+              decoration: InputDecoration(
+                hintText: "Enter",
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              sendOrder();
+            },
+            child: RichText(
+                text: TextSpan(
+                    text: 'send', style: TextStyle(color: Colors.white))),
           ),
         ],
       ),
