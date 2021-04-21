@@ -42,11 +42,12 @@ class _SendOrderWidgetState extends State<SendOrderWidget> {
 
   void getLocationResults(String input) async {
     String kPLACES_API_KEY = "AIzaSyC1OPHCFm8_Uty6HKqNTCiZyl0rPOUyZRE";
-    String type = '(regions)';
+    String type = 'address';
+    String language='ru';
     String baseURL =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     String request =
-        '$baseURL?input=$input&key=$kPLACES_API_KEY&sessiontoken=$_sessionToken';
+        '$baseURL?input=$input&key=$kPLACES_API_KEY&sessiontoken=$_sessionToken&language=$language&types=$type';
     var response = await http.get(Uri.parse(request));
     if (response.statusCode == 200) {
       setState(() {
