@@ -65,7 +65,7 @@ Future<void> makeOrder(CreateOrderDto orderDto) async {
 
   print('object test1');
   final response =
-      await ioClient.post(Uri.parse('https://192.168.21.102:8443/api/order/create'),
+      await ioClient.post(Uri.parse('https://akiana.io:8443/api/order/create'),
           headers: {
             HttpHeaders.contentTypeHeader: 'application/json',
           },
